@@ -2,10 +2,10 @@ version: '3'
 
 services:
   php:
-    container_name: HW_1
+    container_name: HW
     build: ./
     volumes:
-      - ./:/app
+      - ./:/var/www/html
     ports:
       - "8080:80"
     restart: always
