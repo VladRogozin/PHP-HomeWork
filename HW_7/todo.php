@@ -1,31 +1,34 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace MyTodo;
+
 class Todo {
-    const FILE_PATH = 'tasks.json';
-    const TASK_NOT_COMPLETED = 'не виконано';
-    const TASK_COMPLETED = 'виконано';
+    public $file = '';
+
+    private StatusEnum $newStatusEnum;
     private $tasks = [];
 
-    public function __construct()
+    public function __construct(string $file)
     {
+        $this->file = $file;
         $this->loadTasks();
     }
 
-    public function addTasks(string $taskName, int $priority):void
+    public function addTasks(string $taskName, int $priority): void
     {
         $task = [
             'id' => uniqid(),
             'name' => $taskName,
             'priority' => $priority,
-            'status' => self::TASK_NOT_COMPLETED,
+            'status' => StatusEnum::NOT_COMPLETED,
         ];
 
         $this->tasks[] = $task;
         $this->saveTasks();
     }
 
-    public function deleteTask(string $taskId):void
+    public function deleteTask(string $taskId): void
     {
         foreach ($this->tasks as $key => $task) {
             if ($task['id'] === $taskId) {
@@ -45,29 +48,27 @@ class Todo {
         return $sortedTasks;
     }
 
-    public function completeTask(string $taskId):void
+    public function completeTask(string $taskId): void
     {
         foreach ($this->tasks as &$task) {
             if ($task['id'] === $taskId) {
-                $task['status'] = self::TASK_COMPLETED;
+                $task['status'] = StatusEnum::COMPLETED;
                 $this->saveTasks();
                 break;
             }
         }
     }
 
-    private function loadTasks():void
+    private function loadTasks(): void
     {
-        if (file_exists(self::FILE_PATH)) {
-            $data = file_get_contents(self::FILE_PATH);
+        if (file_exists($this->file)) {
+            $data = file_get_contents($this->file);
             $this->tasks = json_decode($data, true);
         }
     }
 
     private function saveTasks(): void
     {
-        file_put_contents(self::FILE_PATH, json_encode($this->tasks, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        file_put_contents($this->file, json_encode($this->tasks, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     }
-
 }
-
